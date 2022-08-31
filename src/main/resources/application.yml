@@ -15,4 +15,8 @@ spring:
         url: jdbc:h2:tcp://localhost/~/Documents/Study/h2/db/todo22
         username: sa
         password:
+      - name: db-3
+        url:
+        username: sa
+        password:
 
