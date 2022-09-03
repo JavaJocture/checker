@@ -6,17 +6,22 @@ spring:
     active: local
 
   datasource:
+    #type: com.zaxxer.hikari.HikariDataSource # FQCN(Fully Qualified Class Name)
+    #type: org.apache.commons.dbcp.BasicDataSource
     list:
       - name: db-1
         url: jdbc:h2:tcp://localhost/~/Documents/Study/h2/db/todo
         username: sa
         password:
       - name: db-2
-        url: jdbc:h2:tcp://localhost/~/Documents/Study/h2/db/todo22
+        url: jdbc:h2:tcp://localhost/~/Documents/Study/h2/db/todo
         username: sa
         password:
-      - name: db-3
-        url:
-        username: sa
-        password:
+#      - name: db-3
+#        url:
+#        username: sa
+#        password:
 
+logging:
+  level:
+    jocture.checker: DEBUG
