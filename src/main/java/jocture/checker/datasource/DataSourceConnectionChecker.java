@@ -1,14 +1,12 @@
 package jocture.checker.datasource;
 
+import jocture.checker.checker.AbstractChecker;
 import jocture.checker.datasource.factory.DataSourceFactory;
 import jocture.checker.datasource.factory.DataSourceFactorySelector;
 import jocture.checker.datasource.properties.ConnectionProperties;
 import jocture.checker.datasource.properties.DataSourceProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ExitCodeGenerator;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -18,19 +16,17 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataSourceConnectionChecker implements ExitCodeGenerator {
+public class DataSourceConnectionChecker extends AbstractChecker {
 
     private final DataSourceProperties dataSourceProperties;
     private final DataSourceFactorySelector dataSourceFactorySelector;
     private DataSourceFactory dataSourceFactory;
-    private int exitCode = 0;
 
     @Override
-    public int getExitCode() {
-        return exitCode;
+    protected void doCheck() {
+        checkConnections();
     }
 
-    @EventListener(ApplicationReadyEvent.class)
     public void checkConnections() {
         selectDataSourceFactory();
         List<ConnectionProperties> propList = dataSourceProperties.getList();
@@ -75,6 +71,7 @@ public class DataSourceConnectionChecker implements ExitCodeGenerator {
 
         // DataSource 인터페이스를 사용하면, 구성과 사용이 분리된다.
         DataSource dataSource = dataSourceFactory.create(prop);
+        log.debug(">>> DataSource={}", dataSource);
         try (Connection conn = dataSource.getConnection()) {
             log.info("SUCCESS : {} ({})", prop.getName(), prop.getUrl());
             return true;
@@ -86,7 +83,7 @@ public class DataSourceConnectionChecker implements ExitCodeGenerator {
 
     private void setExitCodeToErrorIfNotAllSuccess(long successCount) {
         if (successCount < dataSourceProperties.getList().size()) {
-            exitCode = 1;
+            setExitCodeToError();
         }
     }
 }
